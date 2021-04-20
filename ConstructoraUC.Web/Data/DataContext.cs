@@ -10,6 +10,11 @@ namespace ConstructoraUC.Web.Data
         }
 
         public DbSet<Country> Countries { get; set; }
+        public DbSet<City> Cities{ get; set; }
+        public DbSet<Project> Projects{ get; set; }
+        public DbSet<Block> Blocks { get; set; }
+        public DbSet<Property> Properties{ get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -17,6 +22,22 @@ namespace ConstructoraUC.Web.Data
 
             modelBuilder.Entity<Country>()
               .HasIndex(t => t.Name)
+              .IsUnique();
+
+            modelBuilder.Entity<City>()
+              .HasIndex(t => t.Name)
+              .IsUnique();
+
+            modelBuilder.Entity<Project>()
+              .HasIndex(t => t.Name)
+              .IsUnique();
+
+            modelBuilder.Entity<Block>()
+              .HasIndex(t => t.Name)
+              .IsUnique();
+
+            modelBuilder.Entity<Property>()
+              .HasIndex(t => t.Identificador)
               .IsUnique();
 
         }

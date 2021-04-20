@@ -1,30 +1,29 @@
 ﻿using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 using System.Text;
 
 namespace ConstructoraUC.Common.Entities
 {
-    public class City
+    public class Property
     {
         public int Id { get; set; }
 
         [MaxLength(50, ErrorMessage = "The filed {0} must contain less than {1} characteres.")]
         [Required]
-        [Display(Name = "City")]
-        public string Name { get; set; }
+        [Display(Name = "Identificador")]
+        public String Identificador { get; set; }
 
-        public ICollection<Project> Projects { get; set; }
-
-        [DisplayName("Projects Number")]
-        public int ProjectsNumber => Projects == null ? 0 : Projects.Count;
+        [MaxLength(10, ErrorMessage = "The filed {0} must contain less than {1} characteres.")]
+        [Required]
+        [Display(Name = "Value")]
+        public double Value { get; set; }
 
         [JsonIgnore]
         [NotMapped]
-        public int IdCountry { get; set; }
+        public int IdBlock { get; set; }
 
     }
 }

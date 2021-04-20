@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
 using System.Text;
 
@@ -13,6 +14,11 @@ namespace ConstructoraUC.Common.Entities
         [Required]
         [Display(Name = "Country")]
         public String Name { get; set; }
+
+        public ICollection<City> Cities { get; set; }
+
+        [DisplayName("Cities Number")]
+        public int CitiesNumber => Cities == null ? 0 : Cities.Count;
 
     }
 }
