@@ -22,7 +22,9 @@ namespace ConstructoraUC.Web.Controllers
         // GET: Countries
         public async Task<IActionResult> Index()
         {
-            return View(await _context.Countries.ToListAsync());
+            return View(await _context.Countries
+                .Include(c => c.Cities)
+                .ToListAsync());
         }
 
         // GET: Countries/Details/5
@@ -34,6 +36,10 @@ namespace ConstructoraUC.Web.Controllers
             }
 
             var country = await _context.Countries
+                .Include(c => c.Cities)
+                .ThenInclude(d => d.Projects)
+                .ThenInclude(b => b.Blocks)
+                .ThenInclude(p => p.Properties)
                 .FirstOrDefaultAsync(m => m.Id == id);
             if (country == null)
             {
@@ -161,11 +167,63 @@ namespace ConstructoraUC.Web.Controllers
             return RedirectToAction(nameof(Index));
         }
 
-       
-
-        private bool CountryExists(int id)
+        public async Task<IActionResult> AddCity(int? id)
         {
-            return _context.Countries.Any(e => e.Id == id);
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            Country country = await _context.Countries.FindAsync(id);
+            if (country == null)
+            {
+                return NotFound();
+            }
+
+            City model = new City { IdCountry = country.Id };
+            return View(model);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> AddCity(City city)
+        {
+            if (ModelState.IsValid)
+            {
+                Country country = await _context.Countries
+                    .Include(c => c.Cities)
+                    .FirstOrDefaultAsync(c => c.Id == city.IdCountry);
+                if (country == null)
+                {
+                    return NotFound();
+                }
+
+                try
+                {
+                    city.Id = 0;
+                    country.Cities.Add(city);
+                    _context.Update(country);
+                    await _context.SaveChangesAsync();
+                    return RedirectToAction($"{nameof(Details)}/{country.Id}");
+                }
+                catch (DbUpdateException dbUpdateException)
+                {
+                    if (dbUpdateException.InnerException.Message.Contains("duplicate"))
+                    {
+                        ModelState.AddModelError(string.Empty, "There are a record with the same name.");
+                    }
+                    else
+                    {
+                        ModelState.AddModelError(string.Empty, dbUpdateException.InnerException.Message);
+                    }
+                }
+                catch (Exception exception)
+                {
+                    ModelState.AddModelError(string.Empty, exception.Message);
+                }
+            }
+
+            return View(city);
         }
     }
 }
